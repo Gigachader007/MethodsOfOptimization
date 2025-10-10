@@ -1,4 +1,7 @@
 #include "SimplexTable.hpp"
+#include "Window/Window.hpp"
+
+#include <glad/gl.h>
 
 //   Si0    x1   x2
 //x3  2     1    -2
@@ -7,6 +10,7 @@
 // F  0     1    -1
 
 int main() {
+    /*
     SimplexTable table(Matrix(4,3, 
         {
             2,  1,  -2,
@@ -31,4 +35,17 @@ int main() {
 
         table.recalculate_matrix(unwraped_solve_row, unwraped_solve_col);
     }
+    */
+
+    if(Window::init(1920, 1080, "SimplexMethodLab")){
+        while(!Window::isShouldClose()){
+            Window::PollEvents();
+
+            glClearColor(0.f, 0.f, 0.f, 1.f);
+            glClear(GL_COLOR_BUFFER_BIT);
+
+            Window::SwapBuffers();
+        }
+    }
+    Window::term();
 }
