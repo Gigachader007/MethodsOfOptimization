@@ -24,6 +24,11 @@ public:
     Matrix& operator=(const Matrix&) = default;
     Matrix& operator=(Matrix&&) = default;
 
+    void resize(const size_t r, const size_t c){
+        rows = r;
+        cols = c;
+        vals.resize(r * c);
+    }
     float& at(const size_t r, const size_t c) {
         if(r >= rows || c >= cols){
             throw std::runtime_error("Index out of range!");
