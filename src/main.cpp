@@ -172,7 +172,7 @@ int main()
                             mat.at(row+1, 0) = -first_task.cond_vals_table.at(row - counter, 0);
                             for(auto col = 0; col < first_task.cond_table.cols_num(); ++col){
                                 mat.at(row, col + 1) = first_task.cond_table.at(row - counter, col);
-                                mat.at(row, col + 1) = -first_task.cond_table.at(row - counter, col);
+                                mat.at(row+1, col + 1) = -first_task.cond_table.at(row - counter, col);
                             }
                             ++row;
                             ++counter;
