@@ -8,6 +8,12 @@
 int main()
 {
 
+    struct TableStory{
+        SimplexTable table;
+        std::map<uint32_t, std::string> cols_names, rows_names;
+        uint32_t selected_row, selected_col;
+    };
+
     struct
     {
         Matrix cond_table = Matrix(0, 0);
@@ -21,7 +27,14 @@ int main()
         int min_max_checker = 0;
         SimplexTable table = SimplexTable(Matrix(0, 0));
         std::map<uint32_t, std::string> cols_names, rows_names;
+        
+        std::vector<TableStory> table_story;
+        ImVec4 color = ImVec4(0, 0.588235319, 1, 1);
     } first_task;
+
+    struct {
+
+    } second_task;
     
     first_task.function_vals.resize(first_task.old_num_of_vals_in_F + 1);
 
@@ -123,9 +136,10 @@ int main()
                 }
                 static char *variants[] = {"min", "max"};
                 ImGui::Combo("<- F", &first_task.min_max_checker, variants, IM_ARRAYSIZE(variants));
-
+                ImGui::ColorEdit4("Selected col/row color", (float*)&first_task.color);
                 if (ImGui::Button("Solve"))
                 {
+                    first_task.table_story.clear();
                     first_task.cols_names.clear();
                     first_task.rows_names.clear();
                     //   Si0    x1   x2
@@ -181,21 +195,63 @@ int main()
 
                     while (!first_task.table.is_done())
                     {
+                        TableStory story{
+                            .table = first_task.table,
+                            .cols_names = first_task.cols_names,
+                            .rows_names = first_task.rows_names,
+                        };
                         auto solve_col = first_task.table.find_solving_col();
                         if (!solve_col.has_value())
                         {
                             break;
                         }
                         auto unwraped_solve_col = solve_col.value();
+                        story.selected_col = unwraped_solve_col;
                         auto solve_row = first_task.table.find_solving_row(unwraped_solve_col);
                         if (!solve_row.has_value())
                         {
                             break;
                         }
                         auto unwraped_solve_row = solve_row.value();
+                        story.selected_row = unwraped_solve_row;
+
+                        first_task.table_story.push_back(story);
+
                         std::swap(first_task.cols_names[unwraped_solve_col], first_task.rows_names[unwraped_solve_row]);
 
                         first_task.table.recalculate_matrix(unwraped_solve_row, unwraped_solve_col);
+                    }
+                }
+                uint32_t step = 0;
+                for(const auto& story : first_task.table_story){
+                    ImGui::Text("Simplex table: step %i", step++);
+                    const auto& mat = story.table.get_matrix();
+                    if(ImGui::BeginTable(("Simplex table: step " + std::to_string(step)).c_str(), mat.cols_num() + 1, ImGuiTableFlags_Borders)){
+                        ImGui::TableSetupColumn("");
+                        for(auto col = 0; col < mat.cols_num(); ++col){
+                            ImGui::TableSetupColumn(story.cols_names.at(col).c_str());
+                        }
+                        ImGui::TableHeadersRow();
+                        for(auto row = 0; row < mat.rows_num(); ++row){
+                            ImGui::TableNextRow();
+                            ImGui::TableNextColumn();
+                            if(row == story.selected_row){
+                                ImGui::TextColored(first_task.color, "%s", story.rows_names.at(row).c_str());
+                            }
+                            else{
+                                ImGui::Text("%s",story.rows_names.at(row).c_str());
+                            }
+                            for(auto col = 0; col < mat.cols_num(); ++col){
+                                ImGui::TableNextColumn();
+                                if(col == story.selected_col || row == story.selected_row){
+                                    ImGui::TextColored(first_task.color, "%f", mat.at(row, col));
+                                }
+                                else{
+                                    ImGui::Text("%f", mat.at(row, col));
+                                }
+                            }
+                        }
+                        ImGui::EndTable();
                     }
                 }
                 ImGui::Text("Result Simplex table");
