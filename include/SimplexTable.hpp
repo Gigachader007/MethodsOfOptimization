@@ -32,6 +32,7 @@ public:
                     return j;
                 }
             }
+            return std::nullopt;
         }
         // 'cause we ignore free member col
         for(auto j = 1; j < mat.cols_num(); ++j){
