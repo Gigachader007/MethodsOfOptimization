@@ -289,7 +289,12 @@ int main()
                         }
                         first_task.cond_table = new_cond_table;
                         first_task.cond_vals_table.resize(max_size, 1);
+
+                        auto c = first_task.function_vals.at(first_task.function_vals.size() - 1);
+                        first_task.function_vals.at(first_task.function_vals.size() - 1) = 0.f;
                         first_task.function_vals.resize(max_size + 1);
+                        first_task.function_vals.at(first_task.function_vals.size() - 1) = c;
+
                         first_task.symbol_items.resize(max_size);
 
                         first_task.num_of_cond = first_task.num_of_vals_in_F = first_task.old_num_of_cond = first_task.old_num_of_vals_in_F = max_size;
