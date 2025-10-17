@@ -278,8 +278,23 @@ int main()
             ImGui::End();
             if(ImGui::Begin("Direct task to Dual task")){
                 ImGui::TextColored(first_task.color, "Using table from 1 task to convert Direct task to Dual task");
-                if(ImGui::Button("Convert") && first_task.cond_table.cols_num() == first_task.cond_table.rows_num()){
-                    
+                if(ImGui::Button("Convert")){
+                    if(first_task.cond_table.cols_num() != first_task.cond_table.rows_num()) {
+                        auto max_size = std::max(first_task.cond_table.cols_num(), first_task.cond_table.rows_num());
+                        auto new_cond_table = Matrix(max_size, max_size);
+                        for(auto i = 0; i < first_task.cond_table.rows_num(); ++i){
+                            for(auto j = 0; j < first_task.cond_table.cols_num(); ++j){
+                                new_cond_table.at(i, j) = first_task.cond_table.at(i, j);
+                            }
+                        }
+                        first_task.cond_table = new_cond_table;
+                        first_task.cond_vals_table.resize(max_size, 1);
+                        first_task.function_vals.resize(max_size + 1);
+                        first_task.symbol_items.resize(max_size);
+
+                        first_task.num_of_cond = first_task.num_of_vals_in_F = first_task.old_num_of_cond = first_task.old_num_of_vals_in_F = max_size;
+                    }
+
                     auto new_cond_vals = Matrix(first_task.function_vals.size() - 1, 1);
                     for(auto i = 0; i < new_cond_vals.rows_num(); ++i){
                         new_cond_vals.at(i, 0) = first_task.function_vals.at(i);
