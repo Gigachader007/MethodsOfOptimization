@@ -276,7 +276,43 @@ int main()
                 if(mat.rows_num()) ImGui::Text("%s value of F = %f", (first_task.min_max_checker == 0 ? "min" : "max"), mat.at(mat.rows_num()-1, 0) * (first_task.min_max_checker == 0 ? 1.f : -1.f));
             }
             ImGui::End();
+            if(ImGui::Begin("Direct task to Dual task")){
+                ImGui::TextColored(first_task.color, "Using table from 1 task to convert Direct task to Dual task");
+                if(ImGui::Button("Convert") && first_task.cond_table.cols_num() == first_task.cond_table.rows_num()){
+                    
+                    auto new_cond_vals = Matrix(first_task.function_vals.size() - 1, 1);
+                    for(auto i = 0; i < new_cond_vals.rows_num(); ++i){
+                        new_cond_vals.at(i, 0) = first_task.function_vals.at(i);
+                    }
+                    std::vector<float> new_function_vals(first_task.cond_vals_table.rows_num() + 1);
+                    for(auto i = 0; i < first_task.cond_vals_table.rows_num(); ++i){
+                        new_function_vals.at(i) = first_task.cond_vals_table.at(i, 0);
+                    }
+                    new_function_vals.at(first_task.cond_vals_table.rows_num()) = first_task.function_vals.at(first_task.function_vals.size() - 1);
 
+                    std::swap(first_task.num_of_cond, first_task.num_of_vals_in_F);
+                    std::swap(first_task.old_num_of_cond, first_task.old_num_of_vals_in_F);
+
+                    first_task.function_vals = new_function_vals;
+                    first_task.cond_vals_table = new_cond_vals;
+
+                    first_task.min_max_checker = 1 - first_task.min_max_checker;
+
+                    for(auto& symbol : first_task.symbol_items){
+                        if(symbol == 2) continue;
+                        symbol = 1 - symbol;
+                    }
+
+                    auto new_cond_table = Matrix(first_task.cond_table.cols_num(), first_task.cond_table.rows_num());
+                    for(auto i = 0; i < first_task.cond_table.cols_num(); ++i){
+                        for(auto j = 0; j < first_task.cond_table.rows_num(); ++j){
+                            new_cond_table.at(i, j) = first_task.cond_table.at(j, i);
+                        }
+                    }
+                    first_task.cond_table = new_cond_table;
+                }
+            }
+            ImGui::End();
             Window::SwapBuffers();
         }
     }
