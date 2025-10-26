@@ -7,9 +7,14 @@ class SimplexTable
     std::vector<std::vector<float>> simplex_table;
 
 public:
+    SimplexTable& operator=(const SimplexTable&) = default;
+    SimplexTable(const SimplexTable&) = default;
+
+    SimplexTable& operator=(SimplexTable&&) = default;
+    SimplexTable(SimplexTable&&) = default;
     // Ax <= b
     // F = cx -> min
-    SimplexTable(const std::vector<std::vector<float>> &A, const std::vector<float> &b, const std::vector<float> &c)
+    SimplexTable(const std::vector<std::vector<float>> &A = {}, const std::vector<float> &b = {}, const std::vector<float> &c = {})
     {
         simplex_table = std::vector<std::vector<float>>(b.size() + 1, std::vector<float>(c.size() + 1, 0.f));
         for (auto i = 0; i < simplex_table.size() - 1; ++i)
