@@ -1,3 +1,4 @@
+#pragma once
 #include <vector>
 #include <iostream>
 #include <limits>
@@ -133,7 +134,6 @@ public:
     }
     std::pair<int, int> phase2()
     {
-        // Поиск ведущего столбца: максимальный положительный коэффициент в строке целевой функции
         int col = -1;
         float max_c = 0.f;
         for (size_t j = 1; j < simplex_table[simplex_table.size() - 1].size(); ++j)
@@ -145,13 +145,11 @@ public:
             }
         }
 
-        // Если нет положительных коэффициентов в целевой функции, решение оптимально
         if (col == -1)
         {
             return {-1, -1};
         }
 
-        // Проверка на неограниченность: если все элементы в столбце col неположительны
         bool unbounded = true;
         for (size_t i = 0; i < simplex_table.size() - 1; ++i)
         {
@@ -166,7 +164,6 @@ public:
             throw std::runtime_error("Не ограничена");
         }
 
-        // Выбор ведущей строки: минимальное положительное отношение b[i]/a[i][col]
         float min_ratio = std::numeric_limits<float>::max();
         int row = -1;
         for (size_t i = 0; i < simplex_table.size() - 1; ++i)
@@ -182,7 +179,6 @@ public:
             }
         }
 
-        // Если не найдена подходящая строка, решение не существует
         if (row == -1)
         {
             throw std::runtime_error("Нет подходящего решения");
