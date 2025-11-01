@@ -339,17 +339,16 @@ int main()
                                 long_proof += " + ";
                             }
                         }
-                        // long_proof += " = " + std::to_string(res);
+                        long_proof += " = " + to_string(res);
                         long_proof += " <= " + to_string(first_task.b[i]);
-                        /*
+                        
                         if(res <= first_task.b[i]) {
                             long_proof += " - True";
                         }
                         else{
                             long_proof += " - False";
                         }
-                        */
-                        long_proof += " - True";
+                        
                         ImGui::TextColored(color, (long_proof).c_str());
                     }
                 }
@@ -370,8 +369,10 @@ int main()
                 }
                 static std::vector<float> good_point_val;
                 static float pretty_good_function_value;
+                static std::vector<std::pair<std::vector<float>, float>> points_list;
                 if (ImGui::Button("Find best integer solution (bruteforce)"))
                 {
+                    points_list.clear();
                     good_point_val.clear();
                     pretty_good_function_value = std::numeric_limits<float>::max();
                     if (first_task.min_max_checker)
@@ -493,6 +494,7 @@ int main()
                             {
                                 res += point[i] * first_task.c[i];
                             }
+                            points_list.push_back(std::make_pair(point, res));
                             if (first_task.min_max_checker)
                             {
                                 if (pretty_good_function_value < res)
@@ -520,6 +522,20 @@ int main()
                         ImGui::TextColored(color, ("x" + std::to_string(i + 1) + " = " + to_string(good_point_val[i])).c_str());
                     }
                     ImGui::TextColored(color, "value of F = %s", to_string(pretty_good_function_value).c_str());
+                    for(const auto& [point, val] : points_list){
+                        std::stringstream ss;
+                        ss << "(";
+                        for(auto iter = 0; iter < point.size(); ++iter){
+                            ss << int(point[iter]);
+                            if(iter != point.size() - 1){
+                                ss << ", ";
+                            }
+                        }
+                        ss << ") -> F = ";
+                        ss << val;
+                        std::string str = ss.str();
+                        ImGui::TextColored(color, str.c_str());
+                    }
                 }
             }
             ImGui::End();
@@ -549,7 +565,7 @@ int main()
                                     ImGui::TextColored(color, ("x" + std::to_string(i + 1) + " = " + to_string(x_vals[i])).c_str());
                                 }
                                 ImGui::TextColored(color, ("Is integer solution ? " + (node->is_integer() ? std::string("True") : std::string("False"))).c_str());
-
+                                ImGui::TextColored(color, ("Solved ? " + (node->is_solved() ? std::string("True") : std::string("False"))).c_str());
                                 if (ImGui::BeginTable(name.c_str(), node->get_table().col_count() + 1, ImGuiTableFlags_Borders))
                                 {
                                     ImGui::TableSetupColumn("");
@@ -614,7 +630,7 @@ int main()
                         {
                             if (first_task.min_max_checker)
                             {
-                                if (node->value_of_F(first_task.min_max_checker) > pretty_good_value && node->is_integer())
+                                if (node->value_of_F(first_task.min_max_checker) > pretty_good_value && node->is_integer() && node->is_solved())
                                 {
                                     pretty_good_value = node->value_of_F(first_task.min_max_checker);
                                     x_vals_for_pretty_god_value = node->get_xvals();
@@ -622,7 +638,7 @@ int main()
                             }
                             else
                             {
-                                if (node->value_of_F(first_task.min_max_checker) < pretty_good_value && node->is_integer())
+                                if (node->value_of_F(first_task.min_max_checker) < pretty_good_value && node->is_integer() && node->is_solved())
                                 {
                                     pretty_good_value = node->value_of_F(first_task.min_max_checker);
                                     x_vals_for_pretty_god_value = node->get_xvals();

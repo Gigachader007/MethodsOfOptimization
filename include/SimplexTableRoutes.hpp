@@ -12,8 +12,9 @@ private:
     std::vector<float> c = {};
     std::map<int, std::string> cols_name{}, rows_name{};
     SimplexTable table;
-    bool all_integers;
+    bool all_integers = false;
     size_t selected_x = -1;
+    bool solved = false;
 
     std::shared_ptr<SimplexTableRoutes> left = nullptr, right = nullptr;
 
@@ -27,6 +28,9 @@ public:
     auto &get_right()
     {
         return right;
+    }
+    auto is_solved() {
+        return solved;
     }
     auto &get_left()
     {
@@ -166,11 +170,10 @@ public:
                     left_a[left_a.size() - 1][i] = 1;
                     left_b[left_b.size() - 1] = float(int(x_vals[i]));
 
-                    auto _left = SimplexTableRoutes::make_shared(left_a, left_b, c);
                     try
                     {
-                        _left->solve(min_max_checker, false);
-                        left = _left;
+                        left = SimplexTableRoutes::make_shared(left_a, left_b, c);
+                        left->solve(min_max_checker, false);
                     }
                     catch (std::exception &ex)
                     {
@@ -187,11 +190,10 @@ public:
 
                     right_a[right_a.size() - 1][i] = -1;
                     right_b[right_b.size() - 1] = -(float(int(x_vals[i])) + 1);
-                    auto _right = SimplexTableRoutes::make_shared(right_a, right_b, c);
                     try
                     {
-                        _right->solve(min_max_checker, false);
-                        right = _right;
+                        right = SimplexTableRoutes::make_shared(right_a, right_b, c);
+                        right->solve(min_max_checker, false);
                     }
                     catch (std::exception &ex)
                     {
@@ -201,6 +203,7 @@ public:
                 break;
             }
         }
+        solved = true;
         if (all_integers)
             return;
     }
